@@ -1,0 +1,38 @@
+name: Collect Stats
+
+on:
+  schedule:
+    # В 03:00 UTC каждые 3 дня (понедельник, четверг, воскресенье)
+    - cron: "0 3 * * 1,4,0"
+  workflow_dispatch:
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run stats collector
+        env:
+          GOOGLE_CREDENTIALS:   ${{ secrets.GOOGLE_CREDENTIALS }}
+          GOOGLE_SHEET_ID:      ${{ secrets.GOOGLE_SHEET_ID }}
+          FB_ACCESS_TOKEN:      ${{ secrets.FB_ACCESS_TOKEN }}
+          FB_PAGE_ID_AFS:       ${{ secrets.FB_PAGE_ID_AFS }}
+          FB_PAGE_ID_DSL:       ${{ secrets.FB_PAGE_ID_DSL }}
+          FB_PAGE_ID_JUJU:      ${{ secrets.FB_PAGE_ID_JUJU }}
+          TZ_OFFSET:            "7"
+          YOUTUBE_TOKEN_AFS:    ${{ secrets.YOUTUBE_TOKEN_AFS }}
+          YOUTUBE_TOKEN_DSL:    ${{ secrets.YOUTUBE_TOKEN_DSL }}
+          YOUTUBE_TOKEN_JUJU:   ${{ secrets.YOUTUBE_TOKEN_JUJU }}
+        run: python -m stats.stats_collector

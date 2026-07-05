@@ -1,0 +1,36 @@
+name: Post TikTok
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  post-tiktok:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run TikTok scheduler
+        env:
+          GOOGLE_CREDENTIALS:      ${{ secrets.GOOGLE_CREDENTIALS }}
+          GOOGLE_SHEET_ID:         ${{ secrets.GOOGLE_SHEET_ID }}
+          BUFFER_API_KEY_AFS:      ${{ secrets.BUFFER_API_KEY_AFS }}
+          BUFFER_API_KEY_DSL:      ${{ secrets.BUFFER_API_KEY_DSL }}
+          BUFFER_API_KEY_JUJU:     ${{ secrets.BUFFER_API_KEY_JUJU }}
+          BUFFER_CHANNEL_ID_AFS:   ${{ secrets.BUFFER_CHANNEL_ID_AFS }}
+          BUFFER_CHANNEL_ID_DSL:   ${{ secrets.BUFFER_CHANNEL_ID_DSL }}
+          BUFFER_CHANNEL_ID_JUJU:  ${{ secrets.BUFFER_CHANNEL_ID_JUJU }}
+          TZ_OFFSET:               "7"
+        run: python scheduler_tiktok.py

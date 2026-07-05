@@ -1,0 +1,46 @@
+name: Post FB / IG / TG
+
+on:
+  schedule:
+    # Каждые 30 минут (UTC). UTC+7 → 01:00-17:00 UTC = 08:00-00:00 по Вьентьяну
+    - cron: "*/30 * * * *"
+  workflow_dispatch:  # Ручной запуск из GitHub UI
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run scheduler
+        env:
+          GOOGLE_CREDENTIALS:   ${{ secrets.GOOGLE_CREDENTIALS }}
+          GOOGLE_SHEET_ID:      ${{ secrets.GOOGLE_SHEET_ID }}
+          FB_ACCESS_TOKEN:      ${{ secrets.FB_ACCESS_TOKEN }}
+          FB_PAGE_ID_AFS:       ${{ secrets.FB_PAGE_ID_AFS }}
+          FB_PAGE_ID_DSL:       ${{ secrets.FB_PAGE_ID_DSL }}
+          FB_PAGE_ID_JUJU:      ${{ secrets.FB_PAGE_ID_JUJU }}
+          IG_PAGE_ID_AFS:       ${{ secrets.IG_PAGE_ID_AFS }}
+          IG_PAGE_ID_DSL:       ${{ secrets.IG_PAGE_ID_DSL }}
+          IG_PAGE_ID_JUJU:      ${{ secrets.IG_PAGE_ID_JUJU }}
+          TG_BOT_TOKEN:         ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHANNEL_AFS:       ${{ secrets.TG_CHANNEL_AFS }}
+          TG_CHANNEL_DSL:       ${{ secrets.TG_CHANNEL_DSL }}
+          TG_CHANNEL_JUJU:      ${{ secrets.TG_CHANNEL_JUJU }}
+          TZ_OFFSET:            "7"
+          YOUTUBE_TOKEN_AFS:    ${{ secrets.YOUTUBE_TOKEN_AFS }}
+          YOUTUBE_TOKEN_DSL:    ${{ secrets.YOUTUBE_TOKEN_DSL }}
+          YOUTUBE_TOKEN_JUJU:   ${{ secrets.YOUTUBE_TOKEN_JUJU }}
+          LINE_TOKEN_AFS:       ${{ secrets.LINE_TOKEN_AFS }}
+        run: python scheduler.py
